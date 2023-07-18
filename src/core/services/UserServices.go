@@ -24,6 +24,18 @@ func (instance UserServices) List() ([]user.User, error) {
 	return instance.userRepository.List()
 }
 
+func (instance UserServices) GetByEmail(email string) (*user.User, error) {
+	return instance.userRepository.GetByEmail(email)
+}
+
+func (instance UserServices) DeleteByEmail(email string) error {
+	return instance.userRepository.DeleteByEmail(email)
+}
+
+func (instance UserServices) DeleteAll() error {
+	return instance.userRepository.DeleteAll()
+}
+
 func NewUserServices(userRepository repository.UserLoader) *UserServices {
 	return &UserServices{userRepository: userRepository}
 }

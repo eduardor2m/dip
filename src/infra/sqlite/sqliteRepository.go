@@ -21,13 +21,11 @@ func (instance DatabaseConnectionManager) getConnection() (*sql.Conn, error) {
 		return nil, err
 	}
 
-	conn, err := db.Conn(context.Background())
-
 	userTable := `
 		CREATE TABLE IF NOT EXISTS user (
 		    			id TEXT PRIMARY KEY,
 		    			name TEXT,
-		    			email TEXT
+		    			email TEXT UNIQUE
 		    		);
 	`
 
@@ -36,6 +34,8 @@ func (instance DatabaseConnectionManager) getConnection() (*sql.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	conn, _ := db.Conn(context.Background())
 
 	return conn, nil
 }
