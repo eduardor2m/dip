@@ -4,6 +4,7 @@ import (
 	"context"
 	"dip/src/core/domain/user"
 	"dip/src/core/interfaces/repository"
+	"errors"
 	"github.com/google/uuid"
 )
 
@@ -134,6 +135,11 @@ func (instance UserSqliteRepository) GetByEmail(email string) (*user.User, error
 		return nil, err
 	}
 
+	if !rows.Next() {
+		err = errors.New("user not found")
+		return nil, err
+	}
+
 	defer func() {
 		err = rows.Close()
 
@@ -179,13 +185,24 @@ func (instance UserSqliteRepository) DeleteByEmail(email string) error {
 		}
 	}()
 
-	_, err = conn.ExecContext(
+	rows, err := conn.ExecContext(
 		context.Background(),
 		"DELETE FROM user WHERE email = ?",
 		email,
 	)
 
 	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := rows.RowsAffected()
+
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		err = errors.New("user not found")
 		return err
 	}
 
@@ -207,12 +224,23 @@ func (instance UserSqliteRepository) DeleteAll() error {
 		}
 	}()
 
-	_, err = conn.ExecContext(
+	rows, err := conn.ExecContext(
 		context.Background(),
 		"DELETE FROM user",
 	)
 
 	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := rows.RowsAffected()
+
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		err = errors.New("users not found")
 		return err
 	}
 
